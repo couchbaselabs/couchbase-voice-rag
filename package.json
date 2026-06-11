@@ -1,0 +1,11 @@
+{
+  "name": "couchbase-realtime-rag",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bash scripts/dev-frontend.sh",
+    "dev:api": "bash scripts/dev-backend.sh",
+    "build": "cd frontend && pnpm install && pnpm run build",
+    "lint": "cd frontend && pnpm run lint"
+  }
+}

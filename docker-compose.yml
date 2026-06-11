@@ -1,0 +1,56 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persist Save & Connect settings (db_settings.json, app_users.json)
+      # across `docker-compose down` so the Settings UI auto-fills and
+      # the backend reconnects without re-running Save & Connect.
+      # Fernet decryption of db_settings.json requires a stable
+      # JWT_SECRET -- see .env.example.
+      - ./backend/data:/app/data
+    depends_on:
+      couchbase-server:
+        condition: service_healthy
+
+  couchbase-server:
+    image: couchbase:8.0.0
+    container_name: couchbase-realtime-rag
+    ports:
+      - "8091-8097:8091-8097"
+      - "11210-11211:11210-11211"
+    volumes:
+      - couchbase-data:/opt/couchbase/var
+    # docker-compose default 10s is short for Couchbase 8.0's bucket
+    # / FTS index / disk flush teardown -- SIGKILL at 10s leaves the
+    # named volume in a partial state. 30s is the canonical margin.
+    stop_grace_period: 30s
+    healthcheck:
+      # `/pools` is 200 on a fresh cluster (cluster init not done yet)
+      # but returns 401 once Couchbase has an admin set, so the old
+      # `curl -fsS .../pools` check passed on the very first `up`
+      # and then hung forever on every restart against a preserved
+      # volume. `/ui/index.html` is served unauthenticated as soon as
+      # ns_server is up and stays 200 across the cluster lifecycle.
+      test: ["CMD", "curl", "-fsS", "http://localhost:8091/ui/index.html"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+volumes:
+  couchbase-data:

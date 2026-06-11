@@ -1,0 +1,37 @@
+FROM python:3.13-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ .
+
+EXPOSE 8000
+
+# Default to a single worker. The codebase has several single-process
+# assumptions (cached _cluster SDK handle in couchbase_service, _job_status
+# dict in document_service, in-process token_version, cb_initialized flag).
+# Scale horizontally via replica count (Azure Container Apps / ECS) rather
+# than bumping this — adding workers would silently re-introduce the
+# cross-worker state bugs (the "Vectorizing" infinite-wait was one).
+ENV GUNICORN_WORKERS=1 \
+    GUNICORN_TIMEOUT=120 \
+    GUNICORN_KEEPALIVE=5
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8000/api/health || exit 1
+
+CMD ["sh", "-c", "exec gunicorn main:app \
+    --workers ${GUNICORN_WORKERS} \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 0.0.0.0:8000 \
+    --timeout ${GUNICORN_TIMEOUT} \
+    --keep-alive ${GUNICORN_KEEPALIVE} \
+    --access-logfile - \
+    --error-logfile -"]

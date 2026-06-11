@@ -1,0 +1,17 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff (backend)
+        entry: uv run --project backend ruff check
+        language: system
+        pass_filenames: false
+        files: ^backend/.*\.py$
+
+      - id: pytest
+        name: pytest (backend)
+        entry: uv run --project backend pytest -q
+        language: system
+        pass_filenames: false
+        files: ^backend/.*\.py$
+        stages: [pre-push]

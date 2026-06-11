@@ -1,0 +1,19 @@
+# Capella scenario override.
+#
+# Removes the `depends_on` healthcheck on the bundled couchbase-server
+# container so `up frontend backend` doesn't transitively start it.
+# `.env` values flow through to the backend unchanged via the base
+# `env_file:` (the base no longer defines `environment:` overrides
+# either, so there's nothing else to reset).
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.capella.yml \
+#     up frontend backend
+#
+# Or set once per shell:
+#   export COMPOSE_FILE=docker-compose.yml:docker-compose.capella.yml
+#   docker-compose up frontend backend
+
+services:
+  backend:
+    depends_on: !reset null

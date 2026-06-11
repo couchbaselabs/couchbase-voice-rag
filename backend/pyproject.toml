@@ -1,0 +1,60 @@
+[project]
+name = "couchbase-realtime-voice-rag-backend"
+version = "1.0.0"
+description = "FastAPI backend for the Couchbase Realtime Voice RAG reference demo."
+readme = "../README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Couchbase Realtime Voice RAG" }]
+
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "gunicorn>=23.0.0",
+    "websockets>=13.0",
+    "openai>=1.40.0",
+    "couchbase>=4.3.0",
+    "pyjwt>=2.9.0",
+    "python-multipart>=0.0.12",
+    "pypdf>=4.0.0",
+    "python-docx>=1.1.0",
+    "langchain-text-splitters>=0.2.0",
+    "python-dotenv>=1.0.0",
+    "pydantic-settings>=2.5.0",
+    "requests>=2.32.0",
+    "httpx>=0.27.0",
+    "tavily-python>=0.5.0",
+    "bcrypt>=4.0.0",
+    "python-magic>=0.4.27",
+    "slowapi>=0.1.9",
+    "python-json-logger>=2.0.7",
+    "cryptography>=44",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-mock>=3.14",
+    "respx>=0.22",
+    "ruff>=0.9",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning:httpx",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+extend-select = ["E", "F", "W", "I"]
+ignore = ["E501"]

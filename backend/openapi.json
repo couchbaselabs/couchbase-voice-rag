@@ -1,0 +1,1464 @@
+{
+  "components": {
+    "schemas": {
+      "Body_upload_document_api_documents_upload_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_document_api_documents_upload_post",
+        "type": "object"
+      },
+      "ChangePasswordRequest": {
+        "description": "Payload for ``POST /api/auth/change-password``.",
+        "properties": {
+          "current_password": {
+            "format": "password",
+            "title": "Current Password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "new_password": {
+            "format": "password",
+            "minLength": 4,
+            "title": "New Password",
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "ChangePasswordRequest",
+        "type": "object"
+      },
+      "ChatMessage": {
+        "description": "One transcript entry exchanged between the user and the assistant.",
+        "properties": {
+          "role": {
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "text"
+        ],
+        "title": "ChatMessage",
+        "type": "object"
+      },
+      "ChatSessionDetail": {
+        "description": "Full chat session document including the message transcript.",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "title",
+          "messages",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ChatSessionDetail",
+        "type": "object"
+      },
+      "ChatSessionSummary": {
+        "description": "One entry in the chat session list (metadata only, no messages).",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "title",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ChatSessionSummary",
+        "type": "object"
+      },
+      "DocumentSummary": {
+        "description": "One entry in the uploaded-document listing.",
+        "properties": {
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "embedding_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Embedding Method"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "workflow_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Name"
+          }
+        },
+        "required": [
+          "filename",
+          "chunk_count"
+        ],
+        "title": "DocumentSummary",
+        "type": "object"
+      },
+      "ForceLogoutResponse": {
+        "description": "Returned after bumping the global JWT version (invalidates all tokens).",
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ForceLogoutResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "JobStatusResponse": {
+        "description": "Current embedding-generation state for a previously uploaded filename.",
+        "properties": {
+          "chunk_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Count"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "processed_files": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processed Files"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_files": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Files"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "JobStatusResponse",
+        "type": "object"
+      },
+      "LoginRequest": {
+        "description": "Credentials submitted to ``POST /api/auth/login``.",
+        "properties": {
+          "password": {
+            "format": "password",
+            "title": "Password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "LoginResponse": {
+        "description": "Issued JWT plus the flag that drives the password-change flow.",
+        "properties": {
+          "must_change_password": {
+            "title": "Must Change Password",
+            "type": "boolean"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "username",
+          "must_change_password"
+        ],
+        "title": "LoginResponse",
+        "type": "object"
+      },
+      "MeResponse": {
+        "description": "Profile summary for the caller's JWT.",
+        "properties": {
+          "must_change_password": {
+            "title": "Must Change Password",
+            "type": "boolean"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "must_change_password"
+        ],
+        "title": "MeResponse",
+        "type": "object"
+      },
+      "OkMessageResponse": {
+        "description": "Acknowledgement with an optional human-readable message.",
+        "example": {
+          "ok": true
+        },
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "OkMessageResponse",
+        "type": "object"
+      },
+      "OkResponse": {
+        "description": "Generic acknowledgement payload used by idempotent mutating endpoints.",
+        "example": {
+          "ok": true
+        },
+        "properties": {
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "OkResponse",
+        "type": "object"
+      },
+      "SaveSessionRequest": {
+        "description": "Payload for persisting a chat session's title and message history.",
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "messages"
+        ],
+        "title": "SaveSessionRequest",
+        "type": "object"
+      },
+      "SaveSettingsResponse": {
+        "description": "Acknowledgement returned after a successful settings save + reconnect.",
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "SaveSettingsResponse",
+        "type": "object"
+      },
+      "SettingsProgressResponse": {
+        "description": "Current stage of the most recent (or in-flight) Save & Connect.",
+        "properties": {
+          "stage": {
+            "description": "One of: idle, applying, capella_user, capella_bucket, connecting, creating_bucket, creating_collections, creating_indexes, building_search_index, saving, done, error.",
+            "title": "Stage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "stage"
+        ],
+        "title": "SettingsProgressResponse",
+        "type": "object"
+      },
+      "SettingsRequest": {
+        "description": "Cluster + OpenAI settings submitted by the Settings UI.",
+        "properties": {
+          "azure_openai_endpoint": {
+            "description": "Azure OpenAI resource URL (https://...).",
+            "title": "Azure Openai Endpoint",
+            "type": "string"
+          },
+          "capella_api_key_id": {
+            "default": "",
+            "description": "Capella Management API key ID (only when EMBEDDING_METHOD=capella).",
+            "format": "password",
+            "title": "Capella Api Key Id",
+            "type": "string",
+            "writeOnly": true
+          },
+          "capella_api_key_token": {
+            "default": "",
+            "description": "Capella Management API key token.",
+            "format": "password",
+            "title": "Capella Api Key Token",
+            "type": "string",
+            "writeOnly": true
+          },
+          "capella_workflow_name": {
+            "default": "realtime_rag_vectorization",
+            "description": "Capella AI Workflow name. Backend looks for an existing workflow with this name on the cluster and reuses it; creates one with this exact name if none exists.",
+            "title": "Capella Workflow Name",
+            "type": "string"
+          },
+          "cb_bucket": {
+            "title": "Cb Bucket",
+            "type": "string"
+          },
+          "cb_collection": {
+            "description": "Collection name. UI auto-fills from ``embedding_method`` (documents_local / documents_capella) but the user can override.",
+            "title": "Cb Collection",
+            "type": "string"
+          },
+          "cb_connection_string": {
+            "description": "``couchbases://...`` endpoint.",
+            "title": "Cb Connection String",
+            "type": "string"
+          },
+          "cb_password": {
+            "format": "password",
+            "title": "Cb Password",
+            "type": "string",
+            "writeOnly": true
+          },
+          "cb_scope": {
+            "default": "_default",
+            "title": "Cb Scope",
+            "type": "string"
+          },
+          "cb_search_index": {
+            "description": "Vector search index name. Auto-filled by UI based on mode.",
+            "title": "Cb Search Index",
+            "type": "string"
+          },
+          "cb_username": {
+            "title": "Cb Username",
+            "type": "string"
+          },
+          "deepgram_api_key": {
+            "default": "",
+            "description": "Deepgram primary STT API key (Whisper is the fallback when blank).",
+            "format": "password",
+            "title": "Deepgram Api Key",
+            "type": "string",
+            "writeOnly": true
+          },
+          "embedding_method": {
+            "default": "capella",
+            "description": "One of ``capella`` (AI Services workflow) or ``python`` (local).",
+            "title": "Embedding Method",
+            "type": "string"
+          },
+          "openai_api_key": {
+            "description": "Azure OpenAI API key.",
+            "format": "password",
+            "title": "Openai Api Key",
+            "type": "string",
+            "writeOnly": true
+          },
+          "openai_embedding_model": {
+            "description": "Azure OpenAI embedding deployment name.",
+            "title": "Openai Embedding Model",
+            "type": "string"
+          },
+          "openai_realtime_model": {
+            "description": "Azure OpenAI Realtime deployment name.",
+            "title": "Openai Realtime Model",
+            "type": "string"
+          },
+          "tavily_api_key": {
+            "default": "",
+            "description": "Tavily key for the web-search fallback.",
+            "format": "password",
+            "title": "Tavily Api Key",
+            "type": "string",
+            "writeOnly": true
+          },
+          "web_search_enabled": {
+            "default": false,
+            "description": "Enable Tavily web-search fallback when KB has no relevant results.",
+            "title": "Web Search Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "cb_connection_string",
+          "cb_username",
+          "cb_password",
+          "cb_bucket",
+          "cb_collection",
+          "cb_search_index",
+          "azure_openai_endpoint",
+          "openai_api_key",
+          "openai_realtime_model",
+          "openai_embedding_model"
+        ],
+        "title": "SettingsRequest",
+        "type": "object"
+      },
+      "SettingsResponse": {
+        "description": "Envelope for :class:`SettingsValues`.",
+        "properties": {
+          "settings": {
+            "$ref": "#/components/schemas/SettingsValues"
+          }
+        },
+        "required": [
+          "settings"
+        ],
+        "title": "SettingsResponse",
+        "type": "object"
+      },
+      "SettingsStatusResponse": {
+        "description": "Whether the backend currently has a live Couchbase connection.",
+        "properties": {
+          "initialized": {
+            "title": "Initialized",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "initialized"
+        ],
+        "title": "SettingsStatusResponse",
+        "type": "object"
+      },
+      "SettingsValues": {
+        "description": "Settings payload returned to the UI. Secret fields come back blank.",
+        "properties": {
+          "azure_openai_endpoint": {
+            "title": "Azure Openai Endpoint",
+            "type": "string"
+          },
+          "capella_api_key_id": {
+            "title": "Capella Api Key Id",
+            "type": "string"
+          },
+          "capella_api_key_token": {
+            "title": "Capella Api Key Token",
+            "type": "string"
+          },
+          "capella_workflow_name": {
+            "title": "Capella Workflow Name",
+            "type": "string"
+          },
+          "cb_bucket": {
+            "title": "Cb Bucket",
+            "type": "string"
+          },
+          "cb_collection": {
+            "title": "Cb Collection",
+            "type": "string"
+          },
+          "cb_connection_string": {
+            "title": "Cb Connection String",
+            "type": "string"
+          },
+          "cb_password": {
+            "title": "Cb Password",
+            "type": "string"
+          },
+          "cb_scope": {
+            "title": "Cb Scope",
+            "type": "string"
+          },
+          "cb_search_index": {
+            "title": "Cb Search Index",
+            "type": "string"
+          },
+          "cb_username": {
+            "title": "Cb Username",
+            "type": "string"
+          },
+          "deepgram_api_key": {
+            "title": "Deepgram Api Key",
+            "type": "string"
+          },
+          "embedding_method": {
+            "title": "Embedding Method",
+            "type": "string"
+          },
+          "openai_api_key": {
+            "title": "Openai Api Key",
+            "type": "string"
+          },
+          "openai_embedding_model": {
+            "title": "Openai Embedding Model",
+            "type": "string"
+          },
+          "openai_realtime_model": {
+            "title": "Openai Realtime Model",
+            "type": "string"
+          },
+          "tavily_api_key": {
+            "title": "Tavily Api Key",
+            "type": "string"
+          },
+          "web_search_enabled": {
+            "title": "Web Search Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "cb_connection_string",
+          "cb_username",
+          "cb_password",
+          "cb_bucket",
+          "cb_scope",
+          "cb_collection",
+          "cb_search_index",
+          "embedding_method",
+          "azure_openai_endpoint",
+          "openai_api_key",
+          "openai_realtime_model",
+          "openai_embedding_model",
+          "capella_api_key_id",
+          "capella_api_key_token",
+          "capella_workflow_name",
+          "deepgram_api_key",
+          "tavily_api_key",
+          "web_search_enabled"
+        ],
+        "title": "SettingsValues",
+        "type": "object"
+      },
+      "UploadResponse": {
+        "description": "Returned immediately after a PDF upload is accepted for processing.",
+        "properties": {
+          "chunk_count": {
+            "title": "Chunk Count",
+            "type": "integer"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "status": {
+            "default": "vectorizing",
+            "description": "Lifecycle state: vectorizing, completed, failed, unknown.",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "chunk_count"
+        ],
+        "title": "UploadResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "name": "Couchbase Realtime Voice RAG",
+      "url": "https://github.com/"
+    },
+    "description": "Reference backend for the Couchbase Realtime Voice RAG demo.\n\nThe API exposes authentication, document ingestion, chat-history persistence,\nCouchbase connection settings, and the WebSocket relay that bridges browser\naudio to the Azure OpenAI Realtime API. Document uploads are chunked and\neither embedded locally via ``text-embedding-3-small`` or vectorized through\nthe Capella AI Services workflow before being indexed for vector search.\n",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "title": "Couchbase Realtime Voice RAG",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/auth/change-password": {
+      "post": {
+        "description": "Rotate the password for the authenticated user and invalidate outstanding JWTs.",
+        "operationId": "change_password_api_auth_change_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkMessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Change the current user's password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/force-logout": {
+      "post": {
+        "description": "Bump the global token version so every previously issued JWT is rejected.",
+        "operationId": "force_logout_api_auth_force_logout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForceLogoutResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Invalidate every issued JWT",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "description": "Verify credentials and return a 24-hour JWT in both the body and an HTTP-only cookie.",
+        "operationId": "login_api_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Authenticate and issue a JWT",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "description": "Drop the ``token`` cookie. JWTs are stateless, so this only affects the browser.",
+        "operationId": "logout_api_auth_logout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkMessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Clear the auth cookie",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "description": "Return the username embedded in the caller's JWT plus any forced-rotation flag.",
+        "operationId": "me_api_auth_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Return the caller's profile",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/chat/sessions": {
+      "get": {
+        "description": "Return every persisted chat session ordered by ``updated_at`` descending.",
+        "operationId": "list_sessions_api_chat_sessions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChatSessionSummary"
+                  },
+                  "title": "Response List Sessions Api Chat Sessions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List saved chat sessions",
+        "tags": [
+          "chat"
+        ]
+      }
+    },
+    "/api/chat/sessions/{session_id}": {
+      "delete": {
+        "description": "Remove the persisted chat session document identified by ``session_id``.",
+        "operationId": "delete_session_api_chat_sessions__session_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete a chat session",
+        "tags": [
+          "chat"
+        ]
+      },
+      "get": {
+        "description": "Return the stored title, timestamps, and full message transcript for ``session_id``.",
+        "operationId": "load_session_api_chat_sessions__session_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatSessionDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Load a chat session",
+        "tags": [
+          "chat"
+        ]
+      },
+      "post": {
+        "description": "Create or overwrite the persisted transcript for ``session_id``.",
+        "operationId": "save_session_api_chat_sessions__session_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Upsert a chat session",
+        "tags": [
+          "chat"
+        ]
+      }
+    },
+    "/api/documents": {
+      "get": {
+        "description": "Aggregate stored chunks by source filename and return per-document summaries.",
+        "operationId": "list_documents_api_documents_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentSummary"
+                  },
+                  "title": "Response List Documents Api Documents Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List uploaded documents",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/documents/status/{filename}": {
+      "get": {
+        "description": "Return the lifecycle state of the background embedding job for ``filename``.",
+        "operationId": "get_upload_status_api_documents_status__filename__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filename",
+            "required": true,
+            "schema": {
+              "title": "Filename",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Check embedding-generation status",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/documents/upload": {
+      "post": {
+        "description": "Validate, store, and schedule embedding generation for an uploaded document.",
+        "operationId": "upload_document_api_documents_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_document_api_documents_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Upload a PDF/DOCX/TXT document",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/documents/{filename}": {
+      "delete": {
+        "description": "Remove every stored chunk whose ``source_filename`` matches ``filename``.",
+        "operationId": "delete_document_api_documents__filename__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filename",
+            "required": true,
+            "schema": {
+              "title": "Filename",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete a document and its chunks",
+        "tags": [
+          "documents"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "description": "Return ``{\"status\": \"ok\"}`` so load balancers can confirm the process is up.",
+        "operationId": "health_check_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness probe",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "description": "Return stored settings, including secret fields.\n\nAuthenticated callers get the same view they'd see in any password\nmanager: the secret values are echoed so the UI can pre-fill inputs\nthat render as ``type=password`` (dot-masked), with an eye toggle\nrevealing plaintext on demand. The on-disk store stays\nFernet-encrypted regardless.",
+        "operationId": "get_settings_api_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Read stored Couchbase settings",
+        "tags": [
+          "settings"
+        ]
+      },
+      "post": {
+        "description": "Persist new connection settings, reconnect to Couchbase, and re-run index setup.\n\nIn Capella mode (and only when a Capella API key is configured), the\nDB user and bucket are auto-created via the Management API before the\nSDK connect attempt. The Docker scenario relies on\n``couchbase_service._init_docker_cluster`` to bootstrap services /\nquotas / admin \u2014 that's invoked from inside ``connect()``.",
+        "operationId": "save_settings_api_settings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveSettingsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Save Couchbase settings and reconnect",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/progress": {
+      "get": {
+        "description": "Return the stage of the most recent (or in-flight) Save & Connect.\n\nPolled by the Settings UI on ~0.5s intervals while the form is\nsubmitting so the button label can advance through \"applying\",\n\"connecting\", \"creating_collections\", \"building_search_index\", etc.\nThe POST /api/settings call itself only resolves at the end of the\nmulti-step setup, so without this endpoint the user has no\nindication of which step is currently running.",
+        "operationId": "settings_progress_api_settings_progress_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsProgressResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Current Save & Connect progress stage",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/status": {
+      "get": {
+        "description": "Return whether the server currently holds a live Couchbase connection.\n\nFalls back to the on-disk settings file if this worker's in-memory\n``cb_initialized`` flag is False. Multi-worker deployments only run\nlifespan-init once per process, so a request can land on a worker that\nmissed the original Save & Connect even though the cluster is fully\nset up. In that case we lazily apply the saved settings + reconnect on\nthe worker, mirroring what lifespan would have done.",
+        "operationId": "settings_status_api_settings_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsStatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Check Couchbase connection status",
+        "tags": [
+          "settings"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Login, logout, password rotation, JWT invalidation.",
+      "name": "auth"
+    },
+    {
+      "description": "Upload, list, and delete knowledge-base documents.",
+      "name": "documents"
+    },
+    {
+      "description": "Persist and reload chat sessions.",
+      "name": "chat"
+    },
+    {
+      "description": "Manage the Couchbase connection used by the backend.",
+      "name": "settings"
+    },
+    {
+      "description": "WebSocket relays for OpenAI Realtime and Deepgram STT.",
+      "name": "realtime"
+    },
+    {
+      "description": "Liveness probe.",
+      "name": "health"
+    }
+  ]
+}
