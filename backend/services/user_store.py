@@ -74,9 +74,10 @@ def set_password(username: str, new_password: str):
     _save_raw(users)
 
 
-def seed_from_plain(plain_users: dict[str, str]) -> int:
+def seed_from_plain(plain_users: dict[str, str], force_change: bool = True) -> int:
     """Seed app_users.json from a plain username:password mapping.
-    Seeded users get must_change_password=True so the first login prompts a change.
+    Seeded users get must_change_password=force_change, so the first login
+    prompts a change when force_change is True (the default).
     Returns number of users seeded (0 if file already has users).
     """
     if _load_raw():
@@ -85,7 +86,7 @@ def seed_from_plain(plain_users: dict[str, str]) -> int:
         {
             "username": username,
             "password_hash": hash_password(password),
-            "must_change_password": True,
+            "must_change_password": force_change,
         }
         for username, password in plain_users.items()
     ]

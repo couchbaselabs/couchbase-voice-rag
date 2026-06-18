@@ -71,6 +71,32 @@ def test_force_logout_invalidates_existing_tokens(client, auth_headers):
     assert after.status_code == 401
 
 
+def test_seed_from_plain_forces_change_by_default():
+    """Seeded users must rotate their password on first login by default."""
+    from services import user_store
+
+    seeded = user_store.seed_from_plain({"admin": "admin1234"})
+    assert seeded == 1
+    assert user_store.must_change_password("admin") is True
+
+
+def test_seed_from_plain_skips_forced_change_when_disabled(client):
+    """force_change=False seeds users without the rotation flag (FORCE_PASSWORD_CHANGE=false)."""
+    from services import user_store
+
+    seeded = user_store.seed_from_plain({"admin": "admin1234"}, force_change=False)
+    assert seeded == 1
+    assert user_store.must_change_password("admin") is False
+
+    # End-to-end: login reflects the cleared flag, so no forced-change redirect.
+    resp = client.post(
+        "/api/auth/login",
+        json={"username": "admin", "password": "admin1234"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["must_change_password"] is False
+
+
 def test_login_rate_limit_trips_after_10(client):
     """11th login attempt inside a minute returns 429."""
     last_status = None

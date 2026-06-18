@@ -91,7 +91,10 @@ def _apply_saved_settings(saved: dict):
 
 
 def _seed_users_if_empty():
-    seeded = user_store.seed_from_plain(config.settings.parse_users())
+    seeded = user_store.seed_from_plain(
+        config.settings.parse_users(),
+        force_change=config.settings.force_password_change,
+    )
     if seeded:
         logger.info(
             "Seeded %d user(s) from APP_USERS env var into app_users.json",

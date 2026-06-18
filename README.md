@@ -500,6 +500,7 @@ pnpm run e2e               # Playwright smoke incl. axe-core a11y scans on /logi
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `APP_USERS` | Login credentials (`user:pass`, comma-separated for multiple) | `admin:admin` |
+| `FORCE_PASSWORD_CHANGE` | Require seeded users to change their password on first login. `false` skips the forced-change screen (useful for demos). Only affects the initial seeding of `app_users.json`. | `true` |
 | `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL (required) | - |
 | `OPENAI_API_KEY` | Azure OpenAI API key (required) | - |
 | `OPENAI_REALTIME_MODEL` | Azure OpenAI Realtime deployment name | `gpt-realtime` |

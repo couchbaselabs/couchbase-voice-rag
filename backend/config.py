@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     # App authentication
     app_users: str = "admin:admin"
     jwt_secret: str = ""  # empty → generate session-scoped random secret
+    # Whether seeded users must change their password on first login. On by
+    # default (the default admin:admin credentials should not persist); set
+    # FORCE_PASSWORD_CHANGE=false to skip the forced change screen.
+    force_password_change: bool = Field(True, alias="FORCE_PASSWORD_CHANGE")
 
     # Azure OpenAI
     azure_openai_endpoint: str = ""
@@ -134,6 +138,7 @@ settings = Settings()
 _ATTR_MAP: dict[str, str] = {
     "APP_USERS": "app_users",
     "JWT_SECRET": "jwt_secret",
+    "FORCE_PASSWORD_CHANGE": "force_password_change",
     "AZURE_OPENAI_ENDPOINT": "azure_openai_endpoint",
     "OPENAI_API_KEY": "openai_api_key",
     "OPENAI_REALTIME_MODEL": "openai_realtime_model",
