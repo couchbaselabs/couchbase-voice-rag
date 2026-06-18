@@ -1,0 +1,9 @@
+# Runtime data must never be baked into the image. The demo treats saved
+# settings (db_settings.json) and seeded users (app_users.json) as
+# ephemeral: a fresh container always boots from .env. See docker-compose.yml.
+backend/data/
+
+# Build/VCS cruft — keeps the build context small.
+.git
+**/node_modules
+frontend/.next

@@ -16,13 +16,11 @@ services:
       - "8000:8000"
     env_file:
       - .env
-    volumes:
-      # Persist Save & Connect settings (db_settings.json, app_users.json)
-      # across `docker-compose down` so the Settings UI auto-fills and
-      # the backend reconnects without re-running Save & Connect.
-      # Fernet decryption of db_settings.json requires a stable
-      # JWT_SECRET -- see .env.example.
-      - ./backend/data:/app/data
+    # No data volume: saved settings (db_settings.json) and seeded users
+    # (app_users.json) live only inside the container and are intentionally
+    # discarded on `docker compose down`. A fresh `up` always boots from
+    # .env (see backend/main.py lifespan). This keeps the demo free of
+    # stale Save & Connect state.
     depends_on:
       couchbase-server:
         condition: service_healthy

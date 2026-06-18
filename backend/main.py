@@ -110,21 +110,28 @@ async def lifespan(app: FastAPI):
     # polled from the frontend via GET /api/settings/progress.
     app.state.settings_progress = {"stage": "idle"}
 
-    # Cluster bring-up is owned by the Settings UI: env-only auto-connect
-    # paths have been removed. We only retry against settings that were
-    # successfully saved in a previous Settings UI Save & Connect.
+    # Cluster bring-up prefers settings saved via the Settings UI, but
+    # falls back to the environment (.env) when none exist. The demo runs
+    # with an ephemeral data dir (no volume), so a fresh container has no
+    # saved settings and connects straight from .env — no Save & Connect
+    # click required. In-session Save & Connect still works and overrides
+    # until the next `docker compose down`.
     saved = settings_store.load_settings()
     if saved:
         logger.info("Found saved settings, trying to connect...")
         _apply_saved_settings(saved)
         method = saved.get("embedding_method", "")
-        if await _try_init_couchbase(method):
-            app.state.cb_initialized = True
-            yield
-            couchbase_service.disconnect()
-            return
+    else:
+        logger.info("No saved settings — connecting from environment (.env)...")
+        method = config.settings.embedding_method_default
 
-    logger.info("No saved settings — Settings UI will collect cluster info.")
+    if await _try_init_couchbase(method):
+        app.state.cb_initialized = True
+        yield
+        couchbase_service.disconnect()
+        return
+
+    logger.info("Couchbase not initialized — Settings UI can configure it.")
     app.state.cb_initialized = False
     yield
     couchbase_service.disconnect()
