@@ -92,7 +92,7 @@ export default function Sidebar({
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-gray-700 p-4">
         <Image src="/couchbase-logo.png" alt="Couchbase" width={32} height={32} />
-        <h1 className="text-lg font-bold text-red-400">Couchbase Realtime Voice RAG</h1>
+        <h1 className="text-lg font-bold text-red-400">Couchbase Voice RAG</h1>
       </div>
 
       {/* Actions */}

@@ -41,7 +41,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           <Image src="/couchbase-logo.png" alt="Couchbase" width={48} height={48} priority />
         </div>
         <h1 className="mb-6 text-center text-2xl font-bold text-gray-100">
-          Couchbase Realtime Voice RAG
+          Couchbase Voice RAG
         </h1>
         <form
           onSubmit={(e) => {

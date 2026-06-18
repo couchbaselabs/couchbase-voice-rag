@@ -289,7 +289,7 @@ wheels = [
 ]
 
 [[package]]
-name = "couchbase-realtime-voice-rag-backend"
+name = "couchbase-voice-rag-backend"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [

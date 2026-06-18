@@ -1,11 +1,11 @@
 [project]
-name = "couchbase-realtime-voice-rag-backend"
+name = "couchbase-voice-rag-backend"
 version = "1.0.0"
-description = "FastAPI backend for the Couchbase Realtime Voice RAG reference demo."
+description = "FastAPI backend for the Couchbase Voice RAG reference demo."
 readme = "../README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
-authors = [{ name = "Couchbase Realtime Voice RAG" }]
+authors = [{ name = "Couchbase Voice RAG" }]
 
 dependencies = [
     "fastapi>=0.115.0",

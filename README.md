@@ -1,4 +1,4 @@
-# Couchbase Realtime Voice RAG
+# Couchbase Voice RAG
 
 A real-time voice and text Retrieval-Augmented Generation (RAG) application powered by **Azure OpenAI Realtime API** and **Couchbase Vector Search**. Upload PDF documents to build a knowledge base, then ask questions via voice or text and receive AI-generated answers grounded in your documents.
 
@@ -278,7 +278,7 @@ Pick one of two paths — the rest of the app behaves identically:
 
 ```bash
 git clone <repository-url>
-cd couchbase-realtime-rag
+cd couchbase-voice-rag
 cp .env.example .env
 # Edit .env (see "Minimum required" below)
 docker-compose up
@@ -330,7 +330,7 @@ The compose file mounts two host-side locations into the containers, so the foll
 
 | What | Where on host | Notes |
 |------|---------------|-------|
-| Couchbase data (bucket, FTS index, users, cluster config) | named volume `couchbase-data` | Created and managed by Docker; inspect with `docker volume inspect couchbase-realtime-rag_couchbase-data`. |
+| Couchbase data (bucket, FTS index, users, cluster config) | named volume `couchbase-data` | Created and managed by Docker; inspect with `docker volume inspect couchbase-voice-rag_couchbase-data`. |
 | Backend saved settings (`db_settings.json`, `app_users.json`) | `./backend/data/` (bind mount) | `.gitignore`'d; secrets in `db_settings.json` are Fernet-encrypted with a key derived from `JWT_SECRET`. |
 
 With a stable `JWT_SECRET` in `.env` (32+ chars), the recommended day-to-day cycle is just:
@@ -398,7 +398,7 @@ Open http://localhost:3000, log in, confirm the pre-filled Capella values, click
 
 ### Manual Development (without Docker)
 
-You'll need a Couchbase instance reachable from your host — point `CB_CONNECTION_STRING` at either a Capella cluster (see above) or any self-hosted Couchbase (just pre-create the bucket; the app handles collections + search index either way). For a manual backend run against a local Couchbase install, set `CB_CONNECTION_STRING=couchbase://localhost` in `.env` (the docker-compose default `couchbase://couchbase` is a service hostname that only resolves inside the compose network).
+You'll need a Couchbase instance reachable from your host — point `CB_CONNECTION_STRING` at either a Capella cluster (see above) or any self-hosted Couchbase (just pre-create the bucket; the app handles collections + search index either way). For a manual backend run against a local Couchbase install, set `CB_CONNECTION_STRING=couchbase://localhost` in `.env` (the docker-compose default `couchbase://couchbase-server` is a service hostname that only resolves inside the compose network).
 
 System dependencies (one-time):
 - **macOS**: `brew install libmagic`
@@ -476,7 +476,7 @@ cd ../frontend && pnpm run generate-api
 
 ```bash
 cd backend
-uv run pytest -q            # 70 tests; Couchbase / Capella API / OpenAI / Tavily stubbed
+uv run pytest -q            # Couchbase / Capella API / OpenAI / Tavily stubbed
 uv run ruff check .         # lint
 ```
 
@@ -487,8 +487,8 @@ The same two commands run in CI on every push/PR via `.github/workflows/backend-
 ```bash
 cd frontend
 pnpm run typecheck && pnpm run lint && pnpm run format:check
-pnpm run test              # 28 unit/component tests
-pnpm run e2e               # 3 Playwright tests incl. axe-core a11y scans on /login + /chat
+pnpm run test              # unit/component suite
+pnpm run e2e               # Playwright smoke incl. axe-core a11y scans on /login + /chat
 ```
 
 `.github/workflows/frontend-tests.yml` runs both as separate jobs (`unit` and `e2e`); the e2e job uploads the `playwright-report/` artifact on failure.
@@ -609,7 +609,7 @@ A `RequestIDMiddleware` assigns each request a UUID (or honours an inbound `X-Re
 ## Project Structure
 
 ```
-couchbase-realtime-rag/
+couchbase-voice-rag/
 +-- backend/
 |   +-- main.py                     # FastAPI app, lifespan, CORS (reads config.ALLOWED_ORIGINS), router registration
 |   +-- config.py                   # pydantic-settings typed config + ALLOWED_ORIGINS shared with WS gate

@@ -29,7 +29,7 @@ services:
 
   couchbase-server:
     image: couchbase:8.0.0
-    container_name: couchbase-realtime-rag
+    container_name: couchbase-voice-rag
     ports:
       - "8091-8097:8091-8097"
       - "11210-11211:11210-11211"

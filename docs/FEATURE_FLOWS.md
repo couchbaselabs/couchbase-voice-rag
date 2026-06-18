@@ -1,4 +1,4 @@
-# Feature Flows — Couchbase Realtime Voice RAG
+# Feature Flows — Couchbase Voice RAG
 
 This document describes every user-facing feature flow in detail, intended as a reference for Playwright E2E test case creation.
 
@@ -46,7 +46,7 @@ This document describes every user-facing feature flow in detail, intended as a 
 - Password input (required, type=password)
 - Submit button ("Login" / "Logging in...")
 - Error message (red text, hidden initially)
-- Couchbase logo + title "Couchbase Realtime Voice RAG"
+- Couchbase logo + title "Couchbase Voice RAG"
 
 ---
 
@@ -421,7 +421,7 @@ Binary PCM16 audio data (raw bytes, 24kHz mono)
 
 ### Login Page
 - Couchbase logo
-- Title: "Couchbase Realtime Voice RAG"
+- Title: "Couchbase Voice RAG"
 - Username input
 - Password input
 - "Login" button

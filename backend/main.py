@@ -128,7 +128,7 @@ async def lifespan(app: FastAPI):
 
 
 API_DESCRIPTION = """\
-Reference backend for the Couchbase Realtime Voice RAG demo.
+Reference backend for the Couchbase Voice RAG demo.
 
 The API exposes authentication, document ingestion, chat-history persistence,
 Couchbase connection settings, and the WebSocket relay that bridges browser
@@ -147,10 +147,10 @@ TAGS_METADATA = [
 ]
 
 app = FastAPI(
-    title="Couchbase Realtime Voice RAG",
+    title="Couchbase Voice RAG",
     description=API_DESCRIPTION,
     version="1.0.0",
-    contact={"name": "Couchbase Realtime Voice RAG", "url": "https://github.com/"},
+    contact={"name": "Couchbase Voice RAG", "url": "https://github.com/"},
     license_info={"name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"},
     openapi_tags=TAGS_METADATA,
     lifespan=lifespan,

@@ -1,5 +1,5 @@
 {
-  "name": "couchbase-realtime-rag",
+  "name": "couchbase-voice-rag",
   "version": "0.1.0",
   "private": true,
   "scripts": {

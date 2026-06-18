@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Couchbase Realtime Voice RAG",
+  title: "Couchbase Voice RAG",
   description: "Real-time voice RAG powered by Couchbase Vector Search and OpenAI Realtime API",
 };
 

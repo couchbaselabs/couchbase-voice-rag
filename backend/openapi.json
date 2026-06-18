@@ -755,15 +755,15 @@
   },
   "info": {
     "contact": {
-      "name": "Couchbase Realtime Voice RAG",
+      "name": "Couchbase Voice RAG",
       "url": "https://github.com/"
     },
-    "description": "Reference backend for the Couchbase Realtime Voice RAG demo.\n\nThe API exposes authentication, document ingestion, chat-history persistence,\nCouchbase connection settings, and the WebSocket relay that bridges browser\naudio to the Azure OpenAI Realtime API. Document uploads are chunked and\neither embedded locally via ``text-embedding-3-small`` or vectorized through\nthe Capella AI Services workflow before being indexed for vector search.\n",
+    "description": "Reference backend for the Couchbase Voice RAG demo.\n\nThe API exposes authentication, document ingestion, chat-history persistence,\nCouchbase connection settings, and the WebSocket relay that bridges browser\naudio to the Azure OpenAI Realtime API. Document uploads are chunked and\neither embedded locally via ``text-embedding-3-small`` or vectorized through\nthe Capella AI Services workflow before being indexed for vector search.\n",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0"
     },
-    "title": "Couchbase Realtime Voice RAG",
+    "title": "Couchbase Voice RAG",
     "version": "1.0.0"
   },
   "openapi": "3.1.0",
