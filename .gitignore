@@ -398,3 +398,6 @@ sketch
 
 ### Runtime data ###
 backend/data/
+
+### Frontend source wrongly caught by the Python `lib/` rule above ###
+!frontend/src/lib/
