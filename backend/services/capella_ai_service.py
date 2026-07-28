@@ -165,6 +165,10 @@ async def create_workflow(name: str | None = None) -> str:
                     "collection": config.CB_COLLECTION,
                 },
                 "vectorizationConfig": {
+                    # Build the Hyperscale vector index over `embedding`; in
+                    # capella mode couchbase_service.vector_search queries it
+                    # via SQL++ APPROX_VECTOR_DISTANCE. Its default similarity
+                    # (L2) must match couchbase_service._VECTOR_METRIC.
                     "createIndexes": True,
                     "embeddingFieldMappings": {
                         "embedding": {

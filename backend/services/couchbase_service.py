@@ -17,7 +17,7 @@ from couchbase.exceptions import (
 from couchbase.management.buckets import BucketSettings, BucketType
 from couchbase.management.collections import CreateCollectionSettings
 from couchbase.management.search import SearchIndex
-from couchbase.options import ClusterOptions
+from couchbase.options import ClusterOptions, QueryOptions
 from couchbase.search import SearchOptions, SearchRequest
 from couchbase.vector_search import VectorQuery, VectorSearch
 
@@ -354,11 +354,42 @@ def _search_index_ready_local(index_name: str) -> tuple[bool, str]:
     return status == "Ready", f"indexStatus={status!r}"
 
 
+# Distance metric for SQL++ APPROX_VECTOR_DISTANCE in capella mode. Must match
+# the similarity of the Capella AI Workflow's Hyperscale vector index (created
+# with similarity "L2"), otherwise the planner cannot use the index and falls
+# back to a full primary scan.
+_VECTOR_METRIC = "L2_SQUARED"
+
+
+def _active_embedding_method() -> str:
+    """Return the embedding method in effect: saved settings, else env default.
+
+    Mirrors ``capella_ai_service.is_configured()``'s resolution so indexing and
+    retrieval agree with how the documents were actually embedded. Imported
+    lazily to avoid an import cycle (settings_store -> ... -> couchbase_service).
+    """
+    from services import settings_store
+
+    saved = settings_store.load_settings() or {}
+    return saved.get("embedding_method", config.EMBEDDING_METHOD_DEFAULT)
+
+
 def _ensure_search_index():
     if not config.CB_SEARCH_INDEX or not config.CB_COLLECTION:
         logger.info(
             "Skipping search-index setup -- search_index=%r collection=%r",
             config.CB_SEARCH_INDEX, config.CB_COLLECTION,
+        )
+        return
+
+    # In capella mode the Capella AI Workflow builds its own Hyperscale (GSI)
+    # vector index over the `embedding` field, which vector_search queries via
+    # SQL++. Building a second app-owned FTS index over the same vectors is
+    # redundant, so skip it here.
+    if _active_embedding_method() == "capella":
+        logger.info(
+            "Skipping app FTS search-index setup -- capella mode uses the "
+            "workflow's Hyperscale vector index."
         )
         return
 
@@ -637,9 +668,52 @@ def has_embedding(doc_id: str) -> bool:
         return False
 
 
+def _vector_search_hyperscale(query_embedding: list[float], top_k: int = 3) -> list[dict]:
+    """Vector search via the Capella AI Workflow's Hyperscale (GSI) vector index.
+
+    Used in capella embedding mode. Runs a SQL++ ``APPROX_VECTOR_DISTANCE``
+    query; the query planner selects the workflow-created ``embedding VECTOR``
+    index automatically when the metric matches the index similarity (L2) --
+    no index name needed. ``top_k`` is inlined as an int literal (we control
+    it; not user input) to avoid a parameter in the LIMIT clause. Returns the
+    same dict shape as the FTS path so callers stay unchanged.
+    """
+    cluster = connect()
+    coll = f"`{config.CB_BUCKET}`.`{config.CB_SCOPE}`.`{config.CB_COLLECTION}`"
+    stmt = (
+        f"SELECT META().id AS id, text, metadata, "
+        f'APPROX_VECTOR_DISTANCE(embedding, $qv, "{_VECTOR_METRIC}") AS _dist '
+        f"FROM {coll} "
+        f'ORDER BY APPROX_VECTOR_DISTANCE(embedding, $qv, "{_VECTOR_METRIC}") '
+        f"LIMIT {int(top_k)}"
+    )
+    result = cluster.query(
+        stmt, QueryOptions(named_parameters={"qv": query_embedding})
+    )
+    docs = []
+    for row in result:
+        text = row.get("text", "")
+        if not text:
+            continue  # Skip results without text content
+        dist = row.get("_dist") or 0.0
+        docs.append({
+            "id": row.get("id"),
+            "text": text,
+            "metadata": row.get("metadata", {}),
+            # Convert distance (lower is better) to a higher-is-better score so
+            # the shape matches the FTS path's `score`.
+            "score": 1.0 / (1.0 + dist),
+        })
+    return docs
+
+
 def vector_search(query_embedding: list[float], top_k: int = 3) -> list[dict]:
-    """Run a dot-product vector search over the configured scope-level
-    search index.
+    """Run a vector search and return the top-k matching chunks.
+
+    In capella mode this queries the Capella AI Workflow's Hyperscale vector
+    index via SQL++ (``_vector_search_hyperscale``). In local/python mode it
+    runs a dot-product FTS query over the app-owned scope-level search index
+    (below).
 
     The index itself remains scope-level (registered via
     ``scope.search_indexes().upsert_index`` with a bare name; RBAC,
@@ -676,6 +750,9 @@ def vector_search(query_embedding: list[float], top_k: int = 3) -> list[dict]:
     write-up, reproduction steps, and the GitHub source pointers
     on which this workaround relies.
     """
+    if _active_embedding_method() == "capella":
+        return _vector_search_hyperscale(query_embedding, top_k)
+
     cluster = connect()
     index_name = config.CB_SEARCH_INDEX
     qualified = f"{config.CB_BUCKET}.{config.CB_SCOPE}.{index_name}"
