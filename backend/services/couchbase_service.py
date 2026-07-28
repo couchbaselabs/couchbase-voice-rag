@@ -821,6 +821,31 @@ def stamp_capella_metadata(filename: str, workflow_id: str) -> None:
         )
 
 
+def set_embedding_method_by_filename(filename: str, method: str) -> None:
+    """Set ``metadata.embedding_method = method`` on every chunk of ``filename``.
+
+    A single N1QL UPDATE (constant-time, like ``stamp_capella_metadata``)
+    used to durably record embedding state — notably ``"failed"`` on an
+    embedding error and ``"pending"`` when a retry starts — so the state
+    survives process restarts (unlike the in-memory job-status dict).
+    """
+    cluster = connect()
+    query = (
+        f"UPDATE `{config.CB_BUCKET}`.`{config.CB_SCOPE}`.`{config.CB_COLLECTION}` "
+        f"SET metadata.embedding_method = $method "
+        f"WHERE metadata.source_filename = $filename"
+    )
+    try:
+        result = cluster.query(query, filename=filename, method=method)
+        for _ in result:
+            pass
+    except Exception as e:
+        logger.warning(
+            "set_embedding_method_by_filename(%r, %r) failed: %s",
+            filename, method, e,
+        )
+
+
 # --- Chat history operations ---
 
 def save_chat_session(session_id: str, title: str, messages: list[dict]):

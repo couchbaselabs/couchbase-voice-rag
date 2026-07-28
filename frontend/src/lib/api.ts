@@ -124,6 +124,13 @@ export async function deleteDocument(filename: string): Promise<void> {
   });
 }
 
+export async function retryEmbedding(filename: string): Promise<UploadResponse> {
+  return fetchJSON<UploadResponse>(
+    `${API_BASE}/documents/retry/${encodeURIComponent(filename)}`,
+    { method: "POST" }
+  );
+}
+
 // Chat sessions
 export async function listSessions(): Promise<ChatSessionSummary[]> {
   return fetchJSON<ChatSessionSummary[]>(`${API_BASE}/chat/sessions`);

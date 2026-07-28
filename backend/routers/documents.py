@@ -130,6 +130,33 @@ def get_upload_status(
     return document_service.get_job_status(_sanitized_filename(filename))
 
 
+@router.post(
+    "/retry/{filename:path}",
+    response_model=UploadResponse,
+    summary="Retry embedding for a previously-failed document",
+)
+async def retry_document(
+    filename: str,
+    background_tasks: BackgroundTasks,
+    username: str = Depends(get_current_user),
+):
+    """Re-embed an existing document from its stored chunk text.
+
+    Used by the Retry action after an embedding failure — no re-upload is
+    needed since chunk texts are already in Couchbase. 404 if the document
+    has no stored chunks.
+    """
+    name = _sanitized_filename(filename)
+    chunk_count = await asyncio.to_thread(
+        couchbase_service.count_chunks_by_filename, name
+    )
+    if chunk_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    background_tasks.add_task(document_service.retry_embedding, name)
+    return UploadResponse(filename=name, chunk_count=chunk_count)
+
+
 @router.delete(
     "/{filename:path}",
     response_model=OkResponse,

@@ -183,8 +183,76 @@ async def _poll_capella_progress(
             pass
 
 
+async def _embed_chunks(filename: str, chunks: list[str]) -> None:
+    """Embed already-extracted chunks via Capella or local Python.
+
+    Sets job status to ``completed`` on success; raises on failure so the
+    caller can record it. Shared by ``generate_embeddings`` (fresh upload)
+    and ``retry_embedding`` (re-embed from stored chunk text).
+    """
+    if capella_ai_service.is_configured():
+        logger.info("Using Capella AI Services for '%s'", filename)
+        try:
+            workflow_id = await capella_ai_service.get_or_create_workflow()
+            run_id = await capella_ai_service.run_workflow(workflow_id)
+
+            stop_progress = asyncio.Event()
+            progress_task = asyncio.create_task(
+                _poll_capella_progress(filename, len(chunks), stop_progress)
+            )
+            try:
+                await capella_ai_service.wait_for_run(workflow_id, run_id)
+            finally:
+                stop_progress.set()
+                await progress_task
+
+            await asyncio.to_thread(
+                _update_capella_metadata_sync,
+                filename, len(chunks), workflow_id,
+            )
+            _set_job_status(
+                filename,
+                {
+                    "status": "completed",
+                    "chunk_count": len(chunks),
+                    "method": "capella",
+                },
+            )
+            logger.info("Capella embedding completed for '%s'", filename)
+            return
+        except Exception as e:
+            logger.warning(
+                "Capella failed for '%s': %s. Falling back to local.",
+                filename, e,
+            )
+
+    logger.info("Using local embedding for '%s'", filename)
+    await asyncio.to_thread(_run_local_embedding_sync, filename, chunks)
+    _set_job_status(
+        filename,
+        {"status": "completed", "chunk_count": len(chunks), "method": "local"},
+    )
+    logger.info("Local embedding completed for '%s'", filename)
+
+
+def _mark_failed(filename: str, exc: Exception) -> None:
+    """Record an embedding failure both durably (Couchbase) and in-memory.
+
+    The in-memory job status is lost on restart / GC'd after 1h, so we also
+    stamp every chunk ``embedding_method="failed"`` — that is what lets the
+    document list surface a persistent failed state (and a Retry button)
+    instead of a perpetual "Vectorizing..." from the leftover "pending".
+    """
+    logger.error("Embedding failed for '%s': %s", filename, exc)
+    _set_job_status(filename, {"status": "failed", "error": str(exc)})
+    try:
+        couchbase_service.set_embedding_method_by_filename(filename, "failed")
+    except Exception as stamp_exc:
+        logger.warning("Could not stamp 'failed' for %r: %s", filename, stamp_exc)
+
+
 async def generate_embeddings(filename: str, file_bytes: bytes) -> None:
-    """Background task: generate embeddings via Capella or local Python.
+    """Background task: extract text, then embed via Capella or local Python.
 
     Runs on the event loop; blocking SDK calls are dispatched to a worker
     thread so a long embedding job does not stall other requests.
@@ -195,51 +263,35 @@ async def generate_embeddings(filename: str, file_bytes: bytes) -> None:
         if not chunks:
             _set_job_status(filename, {"status": "completed", "chunk_count": 0})
             return
-
-        if capella_ai_service.is_configured():
-            logger.info("Using Capella AI Services for '%s'", filename)
-            try:
-                workflow_id = await capella_ai_service.get_or_create_workflow()
-                run_id = await capella_ai_service.run_workflow(workflow_id)
-
-                stop_progress = asyncio.Event()
-                progress_task = asyncio.create_task(
-                    _poll_capella_progress(filename, len(chunks), stop_progress)
-                )
-                try:
-                    await capella_ai_service.wait_for_run(workflow_id, run_id)
-                finally:
-                    stop_progress.set()
-                    await progress_task
-
-                await asyncio.to_thread(
-                    _update_capella_metadata_sync,
-                    filename, len(chunks), workflow_id,
-                )
-                _set_job_status(
-                    filename,
-                    {
-                        "status": "completed",
-                        "chunk_count": len(chunks),
-                        "method": "capella",
-                    },
-                )
-                logger.info("Capella embedding completed for '%s'", filename)
-                return
-            except Exception as e:
-                logger.warning(
-                    "Capella failed for '%s': %s. Falling back to local.",
-                    filename, e,
-                )
-
-        logger.info("Using local embedding for '%s'", filename)
-        await asyncio.to_thread(_run_local_embedding_sync, filename, chunks)
-        _set_job_status(
-            filename,
-            {"status": "completed", "chunk_count": len(chunks), "method": "local"},
-        )
-        logger.info("Local embedding completed for '%s'", filename)
-
+        await _embed_chunks(filename, chunks)
     except Exception as e:
-        logger.error("Embedding failed for '%s': %s", filename, e)
-        _set_job_status(filename, {"status": "failed", "error": str(e)})
+        _mark_failed(filename, e)
+
+
+async def retry_embedding(filename: str) -> None:
+    """Background task: re-embed a document from its stored chunk text.
+
+    Backs the Retry action after an embedding failure — no original file
+    is needed, chunk texts are read back from Couchbase. Chunks are stamped
+    back to ``pending`` first so the UI reads as in-progress even across a
+    page reload, then embedded via the same path as a fresh upload.
+    """
+    try:
+        chunks = await asyncio.to_thread(
+            couchbase_service.get_chunks_by_filename, filename
+        )
+        if not chunks:
+            _set_job_status(
+                filename,
+                {"status": "failed", "error": "No stored chunks to retry"},
+            )
+            return
+        await asyncio.to_thread(
+            couchbase_service.set_embedding_method_by_filename, filename, "pending"
+        )
+        _set_job_status(
+            filename, {"status": "vectorizing", "chunk_count": len(chunks)}
+        )
+        await _embed_chunks(filename, chunks)
+    except Exception as e:
+        _mark_failed(filename, e)
